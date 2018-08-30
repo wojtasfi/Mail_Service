@@ -1,5 +1,6 @@
-package com.config;
+package com.notification.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -20,21 +21,38 @@ import java.util.Properties;
 public class MailConfig {
 
     private static String EMAIL_TEMPLATE_ENCODING = "UTF-8";
+
+    @Value("${mail.host}")
+    private String HOST;
+
+    @Value("${mail.port}")
+    private int PORT;
+
+    @Value("${mail.smtp.auth}")
+    private String AUTH;
+
+    @Value("${mail.login}")
+    private String LOGIN;
+
+    @Value("${mail.password}")
+    private String PASS;
+
+    @Value("${mail.protocol}")
+    private String PROTOCOL;
+
     @Bean
     public JavaMailSender getJavaMailSender() throws IOException {
 
         //todo make it configurable in application.properties
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp://127.0.0.1:1025");
-        mailSender.setPort(1080);
-
-//        mailSender.setUsername("my.gmail@gmail.com");
-//        mailSender.setPassword("password");
+        mailSender.setHost(HOST);
+        mailSender.setPort(PORT);
+        mailSender.setProtocol(PROTOCOL);
+        mailSender.setUsername(LOGIN);
+        mailSender.setPassword(PASS);
 
         Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "false");
-        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.auth", AUTH);
         props.put("mail.debug", "true");
 
         return mailSender;
@@ -64,7 +82,7 @@ public class MailConfig {
 
     private ITemplateResolver textTemplateResolver() {
         final ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setOrder(Integer.valueOf(1));
+        templateResolver.setOrder(1);
         templateResolver.setResolvablePatterns(Collections.singleton("text/*"));
         templateResolver.setPrefix("/mail/");
         templateResolver.setSuffix(".txt");
@@ -76,7 +94,7 @@ public class MailConfig {
 
     private ITemplateResolver htmlTemplateResolver() {
         final ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setOrder(Integer.valueOf(2));
+        templateResolver.setOrder(2);
         templateResolver.setResolvablePatterns(Collections.singleton("html/*"));
         templateResolver.setPrefix("/mail/");
         templateResolver.setSuffix(".html");
@@ -88,7 +106,7 @@ public class MailConfig {
 
     private ITemplateResolver stringTemplateResolver() {
         final StringTemplateResolver templateResolver = new StringTemplateResolver();
-        templateResolver.setOrder(Integer.valueOf(3));
+        templateResolver.setOrder(3);
         // No resolvable pattern, will simply process as a String template everything not previously matched
         templateResolver.setTemplateMode("HTML5");
         templateResolver.setCacheable(false);
