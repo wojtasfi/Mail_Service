@@ -1,6 +1,8 @@
 package com.notification.sender.api;
 
+import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Component
+@RequiredArgsConstructor
 public class SendMailRequestValidator implements Validator {
 
 
@@ -30,7 +33,36 @@ public class SendMailRequestValidator implements Validator {
         SendMailRequest request = (SendMailRequest) target;
         //todo how to validate files urls?
         validateBase64Attachments(errors, request);
+        validateEmailAddesses(errors, request);
+    }
 
+    private void validateEmailAddesses(Errors errors, SendMailRequest request) {
+
+        EmailValidator emailValidator = EmailValidator.getInstance();
+
+        if (!emailValidator.isValid(request.getTo())) {
+            errors.rejectValue("to", "",
+                    format("Not valid email address: %s", request.getTo()));
+        }
+        if (!emailValidator.isValid(request.getFrom())) {
+            errors.rejectValue("from", "",
+                    format("Not valid email address: %s", request.getFrom()));
+        }
+
+        //todo extract to common consumer?
+        request.getCc().forEach(mail -> {
+            if (!emailValidator.isValid(mail)) {
+                errors.rejectValue("cc", "",
+                        format("Not valid email address: %s", mail));
+            }
+        });
+
+        request.getBcc().forEach(mail -> {
+            if (!emailValidator.isValid(mail)) {
+                errors.rejectValue("bcc", "",
+                        format("Not valid email address: %s", mail));
+            }
+        });
     }
 
     private void validateBase64Attachments(Errors errors, SendMailRequest request) {

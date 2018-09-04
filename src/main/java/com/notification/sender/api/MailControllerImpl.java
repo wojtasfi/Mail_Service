@@ -18,16 +18,31 @@ import static java.lang.String.format;
 public class MailControllerImpl implements MailController {
 
     private final MailService mailService;
+    private final SendMailRequestValidator validator;
 
     @Override
     public ResponseEntity<String> sendMail(@RequestBody SendMailRequest request, Errors errors) {
+        validator.validate(request, errors);
+
+        if (errors.hasErrors()) {
+            String errorsString = retrieveErrorsAsString(errors);
+            return ResponseEntity.badRequest().body(format("Following fields have incorrect values: %s", errorsString));
+        }
+
         try {
             mailService.sendMail(request.toDto());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(format("An error occured please contact administrator: %s", e));
+                    .body(format("An error occurred please contact administrator: %s", e));
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    private String retrieveErrorsAsString(Errors errors) {
+        StringBuilder errorsString = new StringBuilder();
+        errors.getAllErrors()
+                .forEach(err -> errorsString.append(err.toString()).append(System.getProperty("line.separator")));
+        return errorsString.toString();
     }
 }
