@@ -4,6 +4,7 @@ import com.notification.sender.domain.dto.MailDto;
 import io.swagger.annotations.ApiParam;
 import lombok.Value;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +12,11 @@ import java.util.Map;
 @Value
 public class SendMailRequest {
     @NotNull
+    @Email
     private String to;
 
     @NotNull
+    @Email
     private String from;
 
     @NotNull

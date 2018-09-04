@@ -20,6 +20,8 @@ public class MailServiceImpl implements MailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
+    private final String htmlExtension = ".html";
+
     @Override
     public void sendMail(MailDto mailDto) throws MessagingException {
         Locale locale = LocaleContextHolder.getLocale();
@@ -32,7 +34,7 @@ public class MailServiceImpl implements MailService {
         final Context ctx = new Context(locale);
         ctx.setVariables(mailDto.getTemplateParams());
 
-        final String htmlContent = this.templateEngine.process("email-basic.html", ctx);
+        final String htmlContent = this.templateEngine.process(mailDto.getTemplateType() + htmlExtension, ctx);
         message.setText(htmlContent, true);
 
         this.mailSender.send(mimeMessage);
