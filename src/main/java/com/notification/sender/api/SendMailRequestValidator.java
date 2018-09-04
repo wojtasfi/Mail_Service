@@ -1,4 +1,4 @@
-package com.notification.boundary.api;
+package com.notification.sender.api;
 
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +38,7 @@ public class SendMailRequestValidator implements Validator {
         if (!toLargeFiles.isEmpty()) {
             val fileNames = retrieveFileNames(toLargeFiles);
             errors.rejectValue("attachmentsBase64Strings", "",
-                    format("Following file are exceeding attachment size limit: %s", fileNames));
+                    format("Following files are exceeding attachment size limit: %s", fileNames));
         }
     }
 

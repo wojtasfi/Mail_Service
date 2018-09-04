@@ -1,6 +1,6 @@
-package com.notification.service;
+package com.notification.sender.service;
 
-import com.notification.domain.dto.MailDto;
+import com.notification.sender.domain.dto.MailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.javamail.JavaMailSender;

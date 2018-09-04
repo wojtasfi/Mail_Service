@@ -1,4 +1,4 @@
-package com.notification.boundary.api;
+package com.notification.sender.api;
 
 import lombok.Value;
 

@@ -1,4 +1,4 @@
-package com.notification.config;
+package com.notification.sender.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +13,6 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -41,7 +40,7 @@ public class MailConfig {
     private String PROTOCOL;
 
     @Bean
-    public JavaMailSender getJavaMailSender() throws IOException {
+    public JavaMailSender getJavaMailSender() {
 
         //todo make it configurable in application.properties
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

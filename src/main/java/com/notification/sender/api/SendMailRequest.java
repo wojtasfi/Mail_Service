@@ -1,6 +1,6 @@
-package com.notification.boundary.api;
+package com.notification.sender.api;
 
-import com.notification.domain.dto.MailDto;
+import com.notification.sender.domain.dto.MailDto;
 import io.swagger.annotations.ApiParam;
 import lombok.Value;
 
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Value
-class SendMailRequest {
+public class SendMailRequest {
     @NotNull
     private String to;
 
@@ -37,7 +37,7 @@ class SendMailRequest {
     private List<FileString> attachmentsBase64Strings;
 
 
-    public MailDto toDto() {
+    MailDto toDto() {
         return new MailDto(to, from, subject, cc, bcc, templateType, templateParams, attachmentsPaths, attachmentsBase64Strings);
     }
 

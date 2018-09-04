@@ -1,7 +1,7 @@
-package com.notification.domain.dto;
+package com.notification.sender.domain.dto;
 
-import com.notification.boundary.api.FilePath;
-import com.notification.boundary.api.FileString;
+import com.notification.sender.api.FilePath;
+import com.notification.sender.api.FileString;
 import lombok.Value;
 
 import java.util.List;

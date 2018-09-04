@@ -1,6 +1,6 @@
-package com.notification.service;
+package com.notification.sender.service;
 
-import com.notification.domain.dto.MailDto;
+import com.notification.sender.domain.dto.MailDto;
 
 import javax.mail.MessagingException;
 

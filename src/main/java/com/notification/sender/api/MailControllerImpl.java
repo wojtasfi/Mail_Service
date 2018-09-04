@@ -1,6 +1,7 @@
-package com.notification.boundary.api;
+package com.notification.sender.api;
 
-import com.notification.service.MailService;
+import com.notification.boundary.api.MailController;
+import com.notification.sender.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
