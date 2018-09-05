@@ -1,5 +1,6 @@
 package com.notification.sender.api;
 
+import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -31,12 +32,29 @@ public class SendMailRequestValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         SendMailRequest request = (SendMailRequest) target;
+        validateRequiredFields(errors, request);
         //todo how to validate files urls?
         validateBase64Attachments(errors, request);
-        validateEmailAddesses(errors, request);
+        validateEmailAddresses(errors, request);
     }
 
-    private void validateEmailAddesses(Errors errors, SendMailRequest request) {
+    private void validateRequiredFields(Errors errors, SendMailRequest request) {
+
+        if (Strings.isNullOrEmpty(request.getTo())) {
+            errors.rejectValue("to", "", "Sender must not be null");
+        }
+        if (Strings.isNullOrEmpty(request.getFrom())) {
+            errors.rejectValue("from", "", "Recipient must not be null");
+        }
+        if (Strings.isNullOrEmpty(request.getSubject())) {
+            errors.rejectValue("subject", "", "Subject must not be null");
+        }
+        if (Strings.isNullOrEmpty(request.getTemplateType())) {
+            errors.rejectValue("templateType", "", "Template type must not be null");
+        }
+    }
+
+    private void validateEmailAddresses(Errors errors, SendMailRequest request) {
 
         EmailValidator emailValidator = EmailValidator.getInstance();
 
