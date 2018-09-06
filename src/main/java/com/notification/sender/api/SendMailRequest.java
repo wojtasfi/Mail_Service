@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,6 +18,9 @@ public class SendMailRequest {
 
     private List<String> cc = new ArrayList<>();
     private List<String> bcc = new ArrayList<>();
+
+    @ApiParam("Indicates in which language template should be. Default value can be set in application properties.s")
+    private Locale locale;
 
     @ApiParam("Type of template which will be used. Has to be consistent with templateParams. This name will be also used as mail`s type.")
     private String templateType;
@@ -35,7 +35,7 @@ public class SendMailRequest {
     private List<FileString> attachmentsBase64Strings = new ArrayList<>();
 
     public MailDto toDto() {
-        return new MailDto(to, from, subject, cc, bcc, templateType, templateParams, attachmentsPaths, attachmentsBase64Strings);
+        return new MailDto(to, from, subject, locale, cc, bcc, templateType, templateParams, attachmentsPaths, attachmentsBase64Strings);
     }
 
 }

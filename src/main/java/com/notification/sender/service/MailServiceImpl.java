@@ -6,7 +6,7 @@ import com.notification.sender.domain.dto.MailDto;
 import com.notification.sender.util.FileUtilities;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -35,13 +35,16 @@ public class MailServiceImpl implements MailService {
 
     private final String htmlExtension = ".html";
 
+    @Value("${default.template.locale}")
+    private Locale defaultLocale;
+
     @Override
     @Transactional
     public void sendMail(MailDto mailDto) throws MessagingException {
-        Locale locale = LocaleContextHolder.getLocale();
         MimeMessageHelper message = createPresetMessage(mailDto);
+        String locale = resolveLocale(mailDto);
 
-        final Context ctx = new Context(locale);
+        final Context ctx = new Context();
         ctx.setVariables(mailDto.getTemplateParams());
 
         final String htmlContent = this.templateEngine.process(mailDto.getTemplateType() + htmlExtension, ctx);
@@ -58,6 +61,13 @@ public class MailServiceImpl implements MailService {
                 log.error("Could not delete file {}:", fileName, e);
             }
         });
+    }
+
+    private String resolveLocale(MailDto mailDto) {
+        if (mailDto.getLocale() == null) {
+            return defaultLocale.toString();
+        }
+        return mailDto.getLocale().toString();
     }
 
     private MimeMessageHelper createPresetMessage(MailDto mailDto) throws MessagingException {
