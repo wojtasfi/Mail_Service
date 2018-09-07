@@ -4,10 +4,7 @@ import com.notification.sender.api.FilePath;
 import com.notification.sender.api.FileString;
 import com.notification.sender.api.SendMailRequest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SendMailRequestBuilder {
     private String to;
@@ -15,6 +12,7 @@ public class SendMailRequestBuilder {
     private String subject;
     private List<String> cc = new ArrayList<>();
     private List<String> bcc = new ArrayList<>();
+    private Locale locale;
     private String templateType;
     private Map<String, Object> templateParams = new HashMap<>();
     private List<FilePath> attachmentsPaths = new ArrayList<>();
@@ -45,6 +43,11 @@ public class SendMailRequestBuilder {
         return this;
     }
 
+    public SendMailRequestBuilder setLocale(Locale locale) {
+        this.locale = locale;
+        return this;
+    }
+
     public SendMailRequestBuilder setTemplateType(String templateType) {
         this.templateType = templateType;
         return this;
@@ -66,6 +69,6 @@ public class SendMailRequestBuilder {
     }
 
     public SendMailRequest build() {
-        return new SendMailRequest(to, from, subject, cc, bcc, templateType, templateParams, attachmentsPaths, attachmentsBase64Strings);
+        return new SendMailRequest(to, from, subject, cc, bcc, locale, templateType, templateParams, attachmentsPaths, attachmentsBase64Strings);
     }
 }

@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class SenderTest {
 
-    @SpyBean
+    @Autowired
     private JavaMailSender javaMailSender;
 
     @SpyBean
@@ -41,13 +41,12 @@ public class SenderTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     private final String template = "test_mail";
     private final Gson gson = new Gson();
 
     @Before
     public void setUp() {
-
+        doNothing().when(javaMailSender).send(any(MimeMessage.class));
     }
 
     @Test
@@ -64,8 +63,6 @@ public class SenderTest {
                 .setTemplateType(template)
                 .setTemplateParams(new HashMap<>())
                 .build();
-
-        doNothing().when(javaMailSender).send(any(MimeMessage.class));
 
         mockMvc.perform(post("/mail")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -89,8 +86,6 @@ public class SenderTest {
                 .setTemplateType(template)
                 .setTemplateParams(new HashMap<>())
                 .build();
-
-        doNothing().when(javaMailSender).send(any(MimeMessage.class));
 
         MvcResult result = mockMvc.perform(post("/mail")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -119,8 +114,6 @@ public class SenderTest {
                 .setTemplateType(template)
                 .setTemplateParams(new HashMap<>())
                 .build();
-
-        doNothing().when(javaMailSender).send(any(MimeMessage.class));
 
         MvcResult result = mockMvc.perform(post("/mail")
                 .contentType(MediaType.APPLICATION_JSON)

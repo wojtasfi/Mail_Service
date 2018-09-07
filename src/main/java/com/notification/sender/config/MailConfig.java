@@ -42,7 +42,6 @@ public class MailConfig {
     @Bean
     public JavaMailSender getJavaMailSender() {
 
-        //todo make it configurable in application.properties
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(HOST);
         mailSender.setPort(PORT);
@@ -64,9 +63,8 @@ public class MailConfig {
         return messageSource;
     }
 
-
     @Bean
-    public TemplateEngine emailTemplateEngine() {
+    public TemplateEngine getTemplateEngine() {
         final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         // Resolver for TEXT emails
         templateEngine.addTemplateResolver(textTemplateResolver());

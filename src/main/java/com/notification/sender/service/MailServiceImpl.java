@@ -6,20 +6,16 @@ import com.notification.sender.domain.dto.MailDto;
 import com.notification.sender.util.FileUtilities;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import static java.lang.String.format;
@@ -30,44 +26,30 @@ import static java.lang.String.format;
 public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
-    private final TemplateEngine templateEngine;
+    private final TemplateService templateService;
     private final FileUtilities fileUtilities;
-
-    private final String htmlExtension = ".html";
-
-    @Value("${default.template.locale}")
-    private Locale defaultLocale;
 
     @Override
     @Transactional
     public void sendMail(MailDto mailDto) throws MessagingException {
         MimeMessageHelper message = createPresetMessage(mailDto);
-        String locale = resolveLocale(mailDto);
 
-        final Context ctx = new Context();
-        ctx.setVariables(mailDto.getTemplateParams());
-
-        final String htmlContent = this.templateEngine.process(mailDto.getTemplateType() + htmlExtension, ctx);
-        message.setText(htmlContent, true);
-
+        message.setText(templateService.resolveEmailText(mailDto), true);
         Map<String, File> filesMap = addAttachmentsIfApplicable(message, mailDto);
 
-        this.mailSender.send(message.getMimeMessage());
+        mailSender.send(message.getMimeMessage());
+        cleanUpTheFiles(filesMap);
+    }
 
+    private void cleanUpTheFiles(Map<String, File> filesMap) {
         filesMap.forEach((fileName, file) -> {
             try {
                 fileUtilities.deleteFile(file);
             } catch (IOException e) {
+                //todo put this task to kafka with retry number and try to delete again
                 log.error("Could not delete file {}:", fileName, e);
             }
         });
-    }
-
-    private String resolveLocale(MailDto mailDto) {
-        if (mailDto.getLocale() == null) {
-            return defaultLocale.toString();
-        }
-        return mailDto.getLocale().toString();
     }
 
     private MimeMessageHelper createPresetMessage(MailDto mailDto) throws MessagingException {
