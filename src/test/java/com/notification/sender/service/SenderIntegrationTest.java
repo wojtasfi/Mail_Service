@@ -1,9 +1,9 @@
-package com.notification.sender;
+package com.notification.sender.service;
 
 import com.google.gson.Gson;
 import com.notification.NotificationServiceApplication;
+import com.notification.sender.SendMailRequestBuilder;
 import com.notification.sender.api.SendMailRequest;
-import com.notification.sender.service.MailService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,9 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NotificationServiceApplication.class)
 @AutoConfigureMockMvc
-public class SenderTest {
+public class SenderIntegrationTest {
 
-    @Autowired
+    @SpyBean
     private JavaMailSender javaMailSender;
 
     @SpyBean

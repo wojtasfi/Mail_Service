@@ -1,9 +1,8 @@
-package com.notification.sender;
+package com.notification.sender.service;
 
 import com.google.gson.Gson;
+import com.notification.sender.SendMailRequestBuilder;
 import com.notification.sender.domain.dto.MailDto;
-import com.notification.sender.service.TemplateService;
-import com.notification.sender.service.TemplateServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

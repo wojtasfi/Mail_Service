@@ -1,7 +1,8 @@
-package com.notification.sender;
+package com.notification.sender.service;
 
 import com.google.gson.Gson;
 import com.notification.NotificationServiceApplication;
+import com.notification.sender.SendMailRequestBuilder;
 import com.notification.sender.api.SendMailRequest;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -36,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = NotificationServiceApplication.class)
 @AutoConfigureMockMvc
 @WebAppConfiguration
-public class MailServiceTest {
+public class MailServiceIntegrationTest {
 
     private final String template = "test_mail";
     private final Gson gson = new Gson();

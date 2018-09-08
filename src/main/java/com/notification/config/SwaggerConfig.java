@@ -1,4 +1,4 @@
-package com.notification.sender.config;
+package com.notification.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
