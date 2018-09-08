@@ -4,8 +4,10 @@ import com.notification.sender.api.FilePath;
 import com.notification.sender.api.FileString;
 import com.notification.sender.domain.dto.MailDto;
 import com.notification.sender.util.FileUtilities;
+import com.notification.shared.MailSentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -28,16 +30,20 @@ public class MailServiceImpl implements MailService {
     private final JavaMailSender mailSender;
     private final TemplateService templateService;
     private final FileUtilities fileUtilities;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     @Transactional
     public void sendMail(MailDto mailDto) throws MessagingException {
         MimeMessageHelper message = createPresetMessage(mailDto);
 
-        message.setText(templateService.resolveEmailText(mailDto), true);
+        String htmlContent = templateService.resolveEmailText(mailDto);
+        message.setText(htmlContent, true);
         Map<String, File> filesMap = addAttachmentsIfApplicable(message, mailDto);
 
         mailSender.send(message.getMimeMessage());
+
+        publisher.publishEvent(new MailSentEvent(this, mailDto, htmlContent));
         cleanUpTheFiles(filesMap);
     }
 
@@ -47,6 +53,7 @@ public class MailServiceImpl implements MailService {
                 fileUtilities.deleteFile(file);
             } catch (IOException e) {
                 //todo put this task to kafka with retry number and try to delete again
+                //todo OR do not delete just generate links to be possible to preview attachments later
                 log.error("Could not delete file {}:", fileName, e);
             }
         });
