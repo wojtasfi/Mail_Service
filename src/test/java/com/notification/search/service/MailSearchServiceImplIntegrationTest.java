@@ -23,8 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.notification.search.service.MailSearchService.*;
+import static com.notification.search.service.MailSearchServiceImpl.*;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NotificationServiceApplication.class)
 @AutoConfigureMockMvc
-public class MailSearchServiceIntegrationTest extends TestWithElasticSearch {
+public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch {
 
     private final String contentTemplate = "test_mail_content";
     private final Gson gson = new Gson();
@@ -107,6 +108,47 @@ public class MailSearchServiceIntegrationTest extends TestWithElasticSearch {
                 "</html>", mail.get(HTML_CONTENT_FIELD).toString()
         );
         assertEquals("Hello World", mail.get(RAW_TEXT_CONTENT_FIELD).toString());
+    }
+
+
+    @Test
+    public void shouldReturnCorrectMailWithTextSearch() throws Exception {
+        //given
+        String to = "test@test.pl";
+        String from = "testFrom@test.pl";
+        String subject = "subject";
+        String text1 = "html";
+        String text2 = "content";
+        String text3 = "content";
+
+        MailDocument mailDocument1 = new MailDocumentBuilder()
+                .setTo(to)
+                .setFrom(from)
+                .setSubject(subject)
+                .setRawTextContent(text1)
+                .createMailDocument();
+
+        MailDocument mailDocument2 = new MailDocumentBuilder()
+                .setTo(to)
+                .setFrom(from)
+                .setSubject(subject)
+                .setRawTextContent(text2)
+                .createMailDocument();
+
+        MailDocument mailDocument3 = new MailDocumentBuilder()
+                .setTo(to)
+                .setFrom(from)
+                .setSubject(subject)
+                .setRawTextContent(text3)
+                .createMailDocument();
+
+        //when
+        mailSearchService.save(mailDocument1, mailDocument2, mailDocument3);
+
+        //then
+        mockMvc.perform(get("/search")
+                .param("text", text1))
+                .andDo(print());
     }
 
     private Map<String, Object> getOneMailFromEs() throws InterruptedException {

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jsoup.Jsoup;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,6 +20,7 @@ public class MailDocument {
     private List<String> bcc;
     private String rawTextContent;
     private String htmlContent;
+    private LocalDate date;
 
     //todo add links to attachments
 
@@ -31,6 +33,7 @@ public class MailDocument {
         document.bcc = event.getBcc();
         document.htmlContent = event.getHtmlContent();
         document.rawTextContent = Jsoup.parse(event.getHtmlContent()).text();
+        document.date = LocalDate.now();
 
         return document;
     }
