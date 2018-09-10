@@ -2,8 +2,10 @@ package com.notification.search;
 
 import com.notification.search.domain.MailDocument;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.notification.search.service.MailSearchService.DATE_FORMAT;
 
 public class MailDocumentBuilder {
     private String to;
@@ -13,7 +15,7 @@ public class MailDocumentBuilder {
     private List<String> bcc;
     private String rawTextContent;
     private String htmlContent;
-    private LocalDate date = LocalDate.now();
+    private String date;
 
     public MailDocumentBuilder setTo(String to) {
         this.to = to;
@@ -51,6 +53,9 @@ public class MailDocumentBuilder {
     }
 
     public MailDocument createMailDocument() {
+        if (date == null) {
+            date = LocalDateTime.now().format(DATE_FORMAT);
+        }
         return new MailDocument(to, from, subject, cc, bcc, rawTextContent, htmlContent, date);
     }
 }

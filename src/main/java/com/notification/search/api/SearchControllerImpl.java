@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,10 +27,9 @@ public class SearchControllerImpl implements SearchController {
 
     @Override
     public List<MailSearchResource> search(@PageableDefault Pageable pageable,
-                                           @RequestParam String text,
-                                           @RequestParam LocalDate from,
-                                           @RequestParam LocalDate to,
-                                           Errors errors) {
+                                           @RequestParam(required = false) String text,
+                                           @RequestParam(required = false) LocalDate from,
+                                           @RequestParam(required = false) LocalDate to) {
         List<MailSearchResource> resources = searchService.search(new SearchQuery(text, from, to), pageable)
                 .stream()
                 .map(assembler::toResource)

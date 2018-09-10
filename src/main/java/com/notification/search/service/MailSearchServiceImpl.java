@@ -6,11 +6,12 @@ import com.notification.search.domain.dto.MailSearchHitDto;
 import com.notification.search.util.ElasticsearchUtilities;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -44,29 +45,41 @@ public class MailSearchServiceImpl implements MailSearchService {
 
     @Override
     public List<MailSearchHitDto> search(SearchQuery searchQuery, Pageable pageable) {
+        SearchRequestBuilder builder = client.prepareSearch(MAIL_INDEX);
 
+        setTextSearch(builder, searchQuery);
+//        setDateSearch(builder, searchQuery);
+//        setPagination(builder, pageable);
+
+        SearchResponse response = builder
+                .execute()
+                .actionGet();
+
+        return esUtils.convertHitsToMailSearchHitDto(response);
+    }
+
+    private void setPagination(SearchRequestBuilder builder, Pageable pageable) {
+        builder.setFrom(Long.valueOf(pageable.getOffset()).intValue())
+                .setSize(pageable.getPageSize());
+        //todo implement sort
+        //                .addSort()
+    }
+
+    private void setDateSearch(SearchRequestBuilder builder, SearchQuery searchQuery) {
         QueryBuilder dateQuery = QueryBuilders
                 .rangeQuery("date")
                 .from(searchQuery.getFromDate())
                 .to(searchQuery.getToDate())
                 .includeLower(false)
                 .includeUpper(false);
+        builder.setQuery(dateQuery);
+    }
 
+    private void setTextSearch(SearchRequestBuilder builder, SearchQuery searchQuery) {
         String text = searchQuery.getText();
-
-        //todo implement sort
-        SearchResponse response = client.prepareSearch(MAIL_INDEX)
-                .setQuery(new TermQueryBuilder(TO_FIELD, text))
-                .setQuery(new TermQueryBuilder(FROM_FIELD, text))
-                .setQuery(new TermQueryBuilder(SUBJECT_FIELD, text))
-                .setQuery(new TermQueryBuilder(RAW_TEXT_CONTENT_FIELD, text))
-                .setQuery(dateQuery)
-                .setFrom(Long.valueOf(pageable.getOffset()).intValue())
-                .setSize(pageable.getPageSize())
-//                .addSort()
-                .execute()
-                .actionGet();
-
-        return esUtils.convertHitsToMailSearchHitDto(response);
+        builder.setQuery(new MatchQueryBuilder(TO_FIELD, text))
+                .setQuery(new MatchQueryBuilder(FROM_FIELD, text))
+                .setQuery(new MatchQueryBuilder(SUBJECT_FIELD, text))
+                .setQuery(new MatchQueryBuilder(RAW_TEXT_CONTENT_FIELD, text));
     }
 }

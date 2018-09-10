@@ -5,6 +5,7 @@ import com.notification.search.domain.MailDocument;
 import com.notification.search.domain.dto.MailSearchHitDto;
 import org.springframework.data.domain.Pageable;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public interface MailSearchService {
@@ -16,6 +17,7 @@ public interface MailSearchService {
     String HTML_CONTENT_FIELD = "html_content";
     String RAW_TEXT_CONTENT_FIELD = "raw_text";
     String DATE_FIELD = "date";
+    DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     void save(MailDocument mailDocument);
 

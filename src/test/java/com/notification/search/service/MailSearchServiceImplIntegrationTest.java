@@ -24,12 +24,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.notification.search.service.MailSearchServiceImpl.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NotificationServiceApplication.class)
 @AutoConfigureMockMvc
@@ -148,7 +148,11 @@ public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch 
         //then
         mockMvc.perform(get("/search")
                 .param("text", text1))
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(1)));
+//                .andExpect(jsonPath("$[0].mailId", ));
     }
 
     private Map<String, Object> getOneMailFromEs() throws InterruptedException {

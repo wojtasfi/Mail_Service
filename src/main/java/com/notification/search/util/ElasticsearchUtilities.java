@@ -10,7 +10,7 @@ import org.elasticsearch.search.SearchHit;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class ElasticsearchUtilities {
                 .field(BCC_FIELD, mailDocument.getBcc())
                 .field(HTML_CONTENT_FIELD, mailDocument.getHtmlContent())
                 .field(RAW_TEXT_CONTENT_FIELD, mailDocument.getRawTextContent())
-                .field(DATE_FIELD, mailDocument.getDate().toString())
+                .timeField(DATE_FIELD, mailDocument.getDate())
                 .endObject();
     }
 
@@ -44,6 +44,18 @@ public class ElasticsearchUtilities {
                 .forEachRemaining(documentFields -> list.add(convertHitToMailSearchHitDto(documentFields)));
         return list;
     }
+//
+//    public int getNow() {
+//        LocalDateTime time = LocalDateTime.now();
+//
+//        String year = String.valueOf(time.getYear());
+//        String month = String.valueOf(time.getMonth());
+//        String day = String.valueOf(time.getDayOfMonth());
+//        String hour = String.valueOf(time.getHour());
+//        String minute = String.valueOf(time.getYear());
+//        String second = String.valueOf(time.getYear());
+//
+//    }
 
     private MailSearchHitDto convertHitToMailSearchHitDto(SearchHit hit) {
 
@@ -61,11 +73,12 @@ public class ElasticsearchUtilities {
         return dto;
     }
 
-    private LocalDate toLocalDateOrNull(Object object) {
+    private LocalDateTime toLocalDateOrNull(Object object) {
         if (object == null) {
             return null;
         }
-        return (LocalDate) object;
+        //LocalDateTime.parse(object.toString)- it also works but I`ll have to lose DATE_FORMAT
+        return LocalDateTime.parse(object.toString(), DATE_FORMAT);
     }
 
     private List<String> toListOrNull(Object object) {

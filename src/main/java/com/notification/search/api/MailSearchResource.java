@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.hateoas.ResourceSupport;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class MailSearchResource extends ResourceSupport {
     private List<String> bcc;
     private String rawTextContent;
     private String htmlContent;
-    private LocalDate date;
+    private LocalDateTime date;
 
     public static MailSearchResource from(MailSearchHitDto dto) {
         return new MailSearchResource(

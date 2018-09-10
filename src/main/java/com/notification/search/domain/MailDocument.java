@@ -6,8 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jsoup.Jsoup;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.notification.search.service.MailSearchService.DATE_FORMAT;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class MailDocument {
     private List<String> bcc;
     private String rawTextContent;
     private String htmlContent;
-    private LocalDate date;
+    private String date;
 
     //todo add links to attachments
 
@@ -33,7 +35,7 @@ public class MailDocument {
         document.bcc = event.getBcc();
         document.htmlContent = event.getHtmlContent();
         document.rawTextContent = Jsoup.parse(event.getHtmlContent()).text();
-        document.date = LocalDate.now();
+        document.date = LocalDateTime.now().format(DATE_FORMAT);
 
         return document;
     }
