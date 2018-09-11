@@ -9,9 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -77,9 +77,10 @@ public class MailSearchServiceImpl implements MailSearchService {
 
     private void setTextSearch(SearchRequestBuilder builder, SearchQuery searchQuery) {
         String text = searchQuery.getText();
-        builder.setQuery(new MatchQueryBuilder(TO_FIELD, text))
-                .setQuery(new MatchQueryBuilder(FROM_FIELD, text))
-                .setQuery(new MatchQueryBuilder(SUBJECT_FIELD, text))
-                .setQuery(new MatchQueryBuilder(RAW_TEXT_CONTENT_FIELD, text));
+        builder.setQuery(new SimpleQueryStringBuilder(text)
+//                .field(TO_FIELD)
+//                .field(FROM_FIELD)
+//                .field(SUBJECT_FIELD)
+                .field(RAW_TEXT_CONTENT_FIELD));
     }
 }

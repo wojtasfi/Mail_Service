@@ -19,17 +19,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.notification.search.service.MailSearchServiceImpl.*;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NotificationServiceApplication.class)
 @AutoConfigureMockMvc
@@ -144,19 +147,27 @@ public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch 
 
         //when
         mailSearchService.save(mailDocument1, mailDocument2, mailDocument3);
-
+        waitTillIndexed();
         //then
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         mockMvc.perform(get("/search")
                 .param("text", text1))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$", hasSize(1)));
-//                .andExpect(jsonPath("$[0].mailId", ));
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].to", is(mailDocument1.getTo())))
+                .andExpect(jsonPath("$[0].rawTextContent", is(mailDocument1.getRawTextContent())))
+                .andExpect(jsonPath("$[0].from", is(mailDocument1.getFrom())))
+                .andExpect(jsonPath("$[0].date", is(mailDocument1.getDate())));
+    }
+
+    private void waitTillIndexed() throws InterruptedException {
+        TimeUnit.SECONDS.sleep(2);
     }
 
     private Map<String, Object> getOneMailFromEs() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(2);
+        waitTillIndexed();
         SearchResponse response = client.prepareSearch(INDEX)
                 .setTypes(INDEX)
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)

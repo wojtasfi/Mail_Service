@@ -17,7 +17,7 @@ public interface MailSearchService {
     String HTML_CONTENT_FIELD = "html_content";
     String RAW_TEXT_CONTENT_FIELD = "raw_text";
     String DATE_FIELD = "date";
-    DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     void save(MailDocument mailDocument);
 
