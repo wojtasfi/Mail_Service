@@ -52,6 +52,11 @@ public class MailDocumentBuilder {
         return this;
     }
 
+    public MailDocumentBuilder setDate(String date) {
+        this.date = date;
+        return this;
+    }
+
     public MailDocument createMailDocument() {
         if (date == null) {
             date = LocalDateTime.now().format(DATE_FORMAT);

@@ -23,6 +23,7 @@ public class TemplateServiceImpl implements TemplateService {
     public String resolveEmailText(MailDto mailDto) {
         Context ctx = createContextWithParams(mailDto);
         String templateName = resolveTemplateFullName(mailDto);
+        //todo load template from file or from DB to make it possible to add template with UI
         return templateEngine.process(templateName, ctx);
     }
 

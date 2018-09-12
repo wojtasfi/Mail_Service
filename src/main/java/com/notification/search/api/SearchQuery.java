@@ -1,14 +1,16 @@
 package com.notification.search.api;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
-@AllArgsConstructor
 public class SearchQuery {
     private String text;
-    private LocalDate fromDate;
-    private LocalDate toDate;
+    private String fromDate;
+    private String toDate;
+
+    public SearchQuery(String text, String fromDate, String toDate) {
+        this.text = text;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+    }
 }

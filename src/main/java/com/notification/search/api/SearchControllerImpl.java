@@ -9,7 +9,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,8 +27,8 @@ public class SearchControllerImpl implements SearchController {
     @Override
     public List<MailSearchResource> search(@PageableDefault Pageable pageable,
                                            @RequestParam(required = false) String text,
-                                           @RequestParam(required = false) LocalDate from,
-                                           @RequestParam(required = false) LocalDate to) {
+                                           @RequestParam(required = false) String from,
+                                           @RequestParam(required = false) String to) {
         List<MailSearchResource> resources = searchService.search(new SearchQuery(text, from, to), pageable)
                 .stream()
                 .map(assembler::toResource)

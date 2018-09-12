@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class MailSearchServiceImpl implements MailSearchService {
         SearchRequestBuilder builder = client.prepareSearch(MAIL_INDEX);
 
         setTextSearch(builder, searchQuery);
-//        setDateSearch(builder, searchQuery);
+        setDateSearch(builder, searchQuery);
 //        setPagination(builder, pageable);
 
         SearchResponse response = builder
@@ -66,21 +66,47 @@ public class MailSearchServiceImpl implements MailSearchService {
     }
 
     private void setDateSearch(SearchRequestBuilder builder, SearchQuery searchQuery) {
-        QueryBuilder dateQuery = QueryBuilders
-                .rangeQuery("date")
-                .from(searchQuery.getFromDate())
-                .to(searchQuery.getToDate())
-                .includeLower(false)
-                .includeUpper(false);
+
+        String fromDate = searchQuery.getFromDate();
+        String toDate = searchQuery.getToDate();
+
+        if (fromDate == null && toDate == null) {
+            return;
+        }
+
+        RangeQueryBuilder dateQuery = QueryBuilders
+                .rangeQuery("date");
+
+        if (fromDate != null && toDate == null) {
+            dateQuery
+                    .from(fromDate)
+                    .includeLower(false)
+                    .includeUpper(true);
+        }
+        if (fromDate == null && toDate != null) {
+            dateQuery
+                    .to(toDate)
+                    .includeLower(true)
+                    .includeUpper(false);
+        }
+        if (fromDate != null && toDate != null) {
+            dateQuery
+                    .from(fromDate)
+                    .to(toDate);
+        }
+
         builder.setQuery(dateQuery);
     }
 
     private void setTextSearch(SearchRequestBuilder builder, SearchQuery searchQuery) {
         String text = searchQuery.getText();
+        if (text == null) {
+            return;
+        }
         builder.setQuery(new SimpleQueryStringBuilder(text)
-//                .field(TO_FIELD)
-//                .field(FROM_FIELD)
-//                .field(SUBJECT_FIELD)
+                .field(TO_FIELD)
+                .field(FROM_FIELD)
+                .field(SUBJECT_FIELD)
                 .field(RAW_TEXT_CONTENT_FIELD));
     }
 }

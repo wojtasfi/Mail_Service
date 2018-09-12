@@ -19,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -149,7 +149,6 @@ public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch 
         mailSearchService.save(mailDocument1, mailDocument2, mailDocument3);
         waitTillIndexed();
         //then
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         mockMvc.perform(get("/search")
                 .param("text", text1))
                 .andDo(print())
@@ -160,6 +159,65 @@ public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch 
                 .andExpect(jsonPath("$[0].rawTextContent", is(mailDocument1.getRawTextContent())))
                 .andExpect(jsonPath("$[0].from", is(mailDocument1.getFrom())))
                 .andExpect(jsonPath("$[0].date", is(mailDocument1.getDate())));
+    }
+
+    @Test
+    public void shouldReturnCorrectMailWithDateSearch() throws Exception {
+        //given
+        String to = "test@test.pl";
+        String from = "testFrom@test.pl";
+        String subject = "subject";
+        String text = "html";
+        String text2 = "html2";
+        int year = 2018;
+        int month = 12;
+        int day = 24;
+
+        String date1 = LocalDateTime.of(year, month, day + 1, 1, 15, 0).format(DATE_FORMAT);
+        String date2 = LocalDateTime.of(year, month, day, 1, 20, 0).format(DATE_FORMAT);
+        String date3 = LocalDateTime.of(year, month, day - 1, 1, 25, 0).format(DATE_FORMAT);
+
+        MailDocument mailDocument1 = new MailDocumentBuilder()
+                .setTo(to)
+                .setFrom(from)
+                .setSubject(subject)
+                .setRawTextContent(text2)
+                .setDate(date1)
+                .createMailDocument();
+
+        MailDocument mailDocument2 = new MailDocumentBuilder()
+                .setTo(to)
+                .setFrom(from)
+                .setSubject(subject)
+                .setRawTextContent(text)
+                .setDate(date2)
+                .createMailDocument();
+
+        MailDocument mailDocument3 = new MailDocumentBuilder()
+                .setTo(to)
+                .setFrom(from)
+                .setSubject(subject)
+                .setRawTextContent(text)
+                .setDate(date3)
+                .createMailDocument();
+
+        //when
+        mailSearchService.save(mailDocument1, mailDocument2, mailDocument3);
+        waitTillIndexed();
+        //then
+        String fromDate = LocalDateTime.of(year, month, day - 2, 0, 0, 0).format(DATE_FORMAT);
+        String toDate = LocalDateTime.of(year, month, day + 2, 0, 0, 0).format(DATE_FORMAT);
+        mockMvc.perform(get("/search")
+                .param("from", fromDate)
+                .param("to", toDate))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].to", is(mailDocument2.getTo())))
+                .andExpect(jsonPath("$[0].rawTextContent", is(mailDocument2.getRawTextContent())))
+                .andExpect(jsonPath("$[0].from", is(mailDocument2.getFrom())))
+                .andExpect(jsonPath("$[0].date", is(mailDocument2.getDate())));
     }
 
     private void waitTillIndexed() throws InterruptedException {
