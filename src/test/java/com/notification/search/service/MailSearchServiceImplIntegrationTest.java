@@ -10,6 +10,7 @@ import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.notification.search.service.MailSearchServiceImpl.*;
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -33,6 +35,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
+//todo figure out how flush works, because when all test are run together than ES sometimes will not manage to index test data in time
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NotificationServiceApplication.class)
 @AutoConfigureMockMvc
@@ -147,7 +151,7 @@ public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch 
 
         //when
         mailSearchService.save(mailDocument1, mailDocument2, mailDocument3);
-        waitTillIndexed();
+        flush();
         //then
         mockMvc.perform(get("/search")
                 .param("text", text1))
@@ -162,7 +166,7 @@ public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch 
     }
 
     @Test
-    public void shouldReturnCorrectMailWithDateSearch() throws Exception {
+    public void shouldReturnCorrectMailWithDateSearchForSameDayww() throws Exception {
         //given
         String to = "test@test.pl";
         String from = "testFrom@test.pl";
@@ -203,10 +207,10 @@ public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch 
 
         //when
         mailSearchService.save(mailDocument1, mailDocument2, mailDocument3);
-        waitTillIndexed();
+        flush();
         //then
-        String fromDate = LocalDateTime.of(year, month, day - 2, 0, 0, 0).format(DATE_FORMAT);
-        String toDate = LocalDateTime.of(year, month, day + 2, 0, 0, 0).format(DATE_FORMAT);
+        String fromDate = LocalDateTime.of(year, month, day, 0, 0, 0).format(DATE_FORMAT);
+        String toDate = LocalDateTime.of(year, month, day, 0, 0, 0).format(DATE_FORMAT);
         mockMvc.perform(get("/search")
                 .param("from", fromDate)
                 .param("to", toDate))
@@ -220,18 +224,22 @@ public class MailSearchServiceImplIntegrationTest extends TestWithElasticSearch 
                 .andExpect(jsonPath("$[0].date", is(mailDocument2.getDate())));
     }
 
-    private void waitTillIndexed() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(2);
+    private void flush() throws InterruptedException {
+        TimeUnit.SECONDS.sleep(5);
+        client.admin().indices().prepareFlush(INDEX).execute().actionGet().getStatus();
     }
 
     private Map<String, Object> getOneMailFromEs() throws InterruptedException {
-        waitTillIndexed();
+        flush();
         SearchResponse response = client.prepareSearch(INDEX)
                 .setTypes(INDEX)
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(QueryBuilders.matchAllQuery())
                 .get();
 
-        return response.getHits().getAt(0).getSourceAsMap();
+        return ofNullable(response.getHits())
+                .map(hits -> hits.getAt(0))
+                .map(SearchHit::getSourceAsMap)
+                .orElse(new HashMap<>());
     }
 }

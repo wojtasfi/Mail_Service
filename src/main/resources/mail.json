@@ -1,0 +1,36 @@
+{
+  "settings": {
+    "number_of_shards": 1
+  },
+  "mappings": {
+    "mail": {
+      "properties": {
+        "to": {
+          "type": "text"
+        },
+        "from": {
+          "type": "text"
+        },
+        "subject": {
+          "type": "text"
+        },
+        "cc": {
+          "type": "text"
+        },
+        "bcc": {
+          "type": "text"
+        },
+        "date": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss"
+        },
+        "html_content": {
+          "type": "text"
+        },
+        "raw_text": {
+          "type": "text"
+        }
+      }
+    }
+  }
+}

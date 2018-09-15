@@ -15,6 +15,7 @@ import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,10 +51,10 @@ public class MailSearchServiceImpl implements MailSearchService {
         setTextSearch(builder, searchQuery);
         setDateSearch(builder, searchQuery);
 //        setPagination(builder, pageable);
-
         SearchResponse response = builder
                 .execute()
                 .actionGet();
+
 
         return esUtils.convertHitsToMailSearchHitDto(response);
     }
@@ -77,25 +78,54 @@ public class MailSearchServiceImpl implements MailSearchService {
         RangeQueryBuilder dateQuery = QueryBuilders
                 .rangeQuery("date");
 
-        if (fromDate != null && toDate == null) {
+        onlyFromDate(fromDate, toDate, dateQuery);
+        onlyToDate(fromDate, toDate, dateQuery);
+        rangeOfDates(fromDate, toDate, dateQuery);
+
+        builder.setQuery(dateQuery);
+    }
+
+    private void rangeOfDates(String fromDate, String toDate, RangeQueryBuilder dateQuery) {
+        if (sameDate(fromDate, toDate)) {
+            toDate = makeEndOfDay(toDate);
+        }
+
+        if (fromDate != null && toDate != null) {
             dateQuery
                     .from(fromDate)
-                    .includeLower(false)
-                    .includeUpper(true);
+                    .to(toDate);
         }
+    }
+
+    private String makeEndOfDay(String toDate) {
+        LocalDateTime to = LocalDateTime.parse(toDate, DATE_FORMAT);
+        return LocalDateTime.of(to.getYear(), to.getMonth(), to.getDayOfMonth(), 23, 59, 59).format(DATE_FORMAT);
+    }
+
+    private boolean sameDate(String fromDate, String toDate) {
+        //in case somebody send for example from and to date equal: 2018-12-24 00:00:00
+        LocalDateTime from = LocalDateTime.parse(fromDate, DATE_FORMAT);
+        LocalDateTime to = LocalDateTime.parse(toDate, DATE_FORMAT);
+
+        return from.isEqual(to);
+    }
+
+    private void onlyToDate(String fromDate, String toDate, RangeQueryBuilder dateQuery) {
         if (fromDate == null && toDate != null) {
             dateQuery
                     .to(toDate)
                     .includeLower(true)
                     .includeUpper(false);
         }
-        if (fromDate != null && toDate != null) {
+    }
+
+    private void onlyFromDate(String fromDate, String toDate, RangeQueryBuilder dateQuery) {
+        if (fromDate != null && toDate == null) {
             dateQuery
                     .from(fromDate)
-                    .to(toDate);
+                    .includeLower(false)
+                    .includeUpper(true);
         }
-
-        builder.setQuery(dateQuery);
     }
 
     private void setTextSearch(SearchRequestBuilder builder, SearchQuery searchQuery) {
