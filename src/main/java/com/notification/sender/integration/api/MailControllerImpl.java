@@ -1,6 +1,7 @@
 package com.notification.sender.integration.api;
 
 import com.notification.integration.api.MailController;
+import com.notification.integration.msg.MailMessageSender;
 import com.notification.sender.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ public class MailControllerImpl implements MailController {
 
     private final MailService mailService;
     private final SendMailRequestValidator validator;
+    private final MailMessageSender sender;
 
     @Override
     public ResponseEntity<String> sendMail(@RequestBody SendMailRequest request, Errors errors) {
@@ -32,6 +34,8 @@ public class MailControllerImpl implements MailController {
         try {
             mailService.sendMail(request.toDto());
         } catch (Exception e) {
+            //todo should we put it to retry with API call also?
+            //sender.putMessageOnResendTopic(request.toDto());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(format("An error occurred please contact administrator: %s", e));
         }

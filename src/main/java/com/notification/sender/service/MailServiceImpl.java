@@ -1,6 +1,7 @@
 package com.notification.sender.service;
 
 import com.notification.config.MailEventPublisher;
+import com.notification.integration.msg.MailMessageSender;
 import com.notification.sender.domain.dto.MailDto;
 import com.notification.sender.integration.api.FilePath;
 import com.notification.sender.integration.api.FileString;
@@ -31,19 +32,23 @@ public class MailServiceImpl implements MailService {
     private final TemplateService templateService;
     private final FileUtilities fileUtilities;
     private final MailEventPublisher publisher;
+    private final MailMessageSender sender;
 
     @Override
     @Transactional
     public void sendMail(MailDto mailDto) throws MessagingException {
+        Map<String, File> filesMap = new HashMap<>();
+        String htmlContent = null;
+
         MimeMessageHelper message = createPresetMessage(mailDto);
 
-        String htmlContent = templateService.resolveEmailText(mailDto);
+        htmlContent = templateService.resolveEmailText(mailDto);
         message.setText(htmlContent, true);
-        Map<String, File> filesMap = addAttachmentsIfApplicable(message, mailDto);
+        filesMap = addAttachmentsIfApplicable(message, mailDto);
 
         mailSender.send(message.getMimeMessage());
-
         publisher.publishEvent(new MailSentEvent(this, mailDto, htmlContent));
+
         cleanUpTheFiles(filesMap);
     }
 
