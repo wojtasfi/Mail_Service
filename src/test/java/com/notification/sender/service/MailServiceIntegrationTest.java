@@ -3,7 +3,7 @@ package com.notification.sender.service;
 import com.google.gson.Gson;
 import com.notification.NotificationServiceApplication;
 import com.notification.sender.SendMailRequestBuilder;
-import com.notification.sender.api.SendMailRequest;
+import com.notification.sender.integration.api.SendMailRequest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

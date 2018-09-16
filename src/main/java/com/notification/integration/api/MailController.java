@@ -1,6 +1,6 @@
-package com.notification.boundary.api;
+package com.notification.integration.api;
 
-import com.notification.sender.api.SendMailRequest;
+import com.notification.sender.integration.api.SendMailRequest;
 import io.swagger.annotations.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;

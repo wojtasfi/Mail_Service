@@ -5,7 +5,7 @@ import com.notification.NotificationServiceApplication;
 import com.notification.search.MailDocumentBuilder;
 import com.notification.search.domain.MailDocument;
 import com.notification.sender.SendMailRequestBuilder;
-import com.notification.sender.api.SendMailRequest;
+import com.notification.sender.integration.api.SendMailRequest;
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;

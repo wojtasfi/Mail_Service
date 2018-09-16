@@ -1,7 +1,7 @@
 package com.notification.sender.util;
 
-import com.notification.sender.api.FilePath;
-import com.notification.sender.api.FileString;
+import com.notification.sender.integration.api.FilePath;
+import com.notification.sender.integration.api.FileString;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;

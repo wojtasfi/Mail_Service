@@ -1,6 +1,6 @@
 package com.notification.search.api;
 
-import com.notification.boundary.api.SearchController;
+import com.notification.integration.api.SearchController;
 import com.notification.search.service.MailSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

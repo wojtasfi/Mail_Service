@@ -1,6 +1,6 @@
-package com.notification.sender.api;
+package com.notification.sender.integration.api;
 
-import com.notification.boundary.api.MailController;
+import com.notification.integration.api.MailController;
 import com.notification.sender.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

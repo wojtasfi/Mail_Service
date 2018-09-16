@@ -1,4 +1,4 @@
-package com.notification.boundary.api;
+package com.notification.integration.api;
 
 import com.notification.search.api.MailSearchResource;
 import io.swagger.annotations.Api;

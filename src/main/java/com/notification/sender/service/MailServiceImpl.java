@@ -1,13 +1,13 @@
 package com.notification.sender.service;
 
-import com.notification.sender.api.FilePath;
-import com.notification.sender.api.FileString;
+import com.notification.config.MailEventPublisher;
 import com.notification.sender.domain.dto.MailDto;
+import com.notification.sender.integration.api.FilePath;
+import com.notification.sender.integration.api.FileString;
 import com.notification.sender.util.FileUtilities;
 import com.notification.shared.MailSentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class MailServiceImpl implements MailService {
     private final JavaMailSender mailSender;
     private final TemplateService templateService;
     private final FileUtilities fileUtilities;
-    private final ApplicationEventPublisher publisher;
+    private final MailEventPublisher publisher;
 
     @Override
     @Transactional

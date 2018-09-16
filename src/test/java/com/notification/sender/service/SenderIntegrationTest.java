@@ -1,9 +1,14 @@
 package com.notification.sender.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.notification.NotificationServiceApplication;
+import com.notification.config.MailEventPublisher;
+import com.notification.integration.msg.MailMessageListener;
+import com.notification.sender.SendMailMessageBuilder;
 import com.notification.sender.SendMailRequestBuilder;
-import com.notification.sender.api.SendMailRequest;
+import com.notification.sender.integration.api.SendMailRequest;
+import com.notification.sender.integration.msg.SendMailMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,8 +43,17 @@ public class SenderIntegrationTest {
     @SpyBean
     private MailService mailService;
 
+    @SpyBean
+    private MailMessageListener mailMessageListener;
+
+    @SpyBean
+    private MailEventPublisher publisher;
+
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private final String template = "test_mail";
     private final Gson gson = new Gson();
@@ -47,6 +61,7 @@ public class SenderIntegrationTest {
     @Before
     public void setUp() {
         doNothing().when(javaMailSender).send(any(MimeMessage.class));
+        doNothing().when(publisher).publishEvent(any());
     }
 
     @Test
@@ -71,6 +86,26 @@ public class SenderIntegrationTest {
                 .andExpect(status().isOk());
 
         verify(mailService, times(1)).sendMail(sendMailRequest.toDto());
+    }
+
+    @Test
+    public void shouldSendSimpleTextMailWithMessageFromKafka() throws Exception {
+
+        String to = "test@test.pl";
+        String from = "testFrom@test.pl";
+        String subject = "subject";
+
+        SendMailMessage sendMailMessage = new SendMailMessageBuilder()
+                .to(to)
+                .from(from)
+                .subject(subject)
+                .templateType(template)
+                .templateParams(new HashMap<>())
+                .build();
+
+        mailMessageListener.handleSendMailMessage(mapper.writeValueAsString(sendMailMessage));
+
+        verify(mailService, times(1)).sendMail(sendMailMessage.toDto());
     }
 
     @Test

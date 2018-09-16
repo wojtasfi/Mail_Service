@@ -1,6 +1,6 @@
 package com.notification.search.api;
 
-import com.notification.boundary.api.SearchController;
+import com.notification.integration.api.SearchController;
 import com.notification.search.domain.dto.MailSearchHitDto;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;

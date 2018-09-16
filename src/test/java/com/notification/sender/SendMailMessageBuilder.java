@@ -2,11 +2,11 @@ package com.notification.sender;
 
 import com.notification.sender.integration.api.FilePath;
 import com.notification.sender.integration.api.FileString;
-import com.notification.sender.integration.api.SendMailRequest;
+import com.notification.sender.integration.msg.SendMailMessage;
 
 import java.util.*;
 
-public class SendMailRequestBuilder {
+public class SendMailMessageBuilder {
     private String to;
     private String from;
     private String subject;
@@ -18,57 +18,57 @@ public class SendMailRequestBuilder {
     private List<FilePath> attachmentsPaths = new ArrayList<>();
     private List<FileString> attachmentsBase64Strings = new ArrayList<>();
 
-    public SendMailRequestBuilder setTo(String to) {
+    public SendMailMessageBuilder to(String to) {
         this.to = to;
         return this;
     }
 
-    public SendMailRequestBuilder setFrom(String from) {
+    public SendMailMessageBuilder from(String from) {
         this.from = from;
         return this;
     }
 
-    public SendMailRequestBuilder setSubject(String subject) {
+    public SendMailMessageBuilder subject(String subject) {
         this.subject = subject;
         return this;
     }
 
-    public SendMailRequestBuilder setCc(List<String> cc) {
+    public SendMailMessageBuilder cc(List<String> cc) {
         this.cc = cc;
         return this;
     }
 
-    public SendMailRequestBuilder setBcc(List<String> bcc) {
+    public SendMailMessageBuilder bcc(List<String> bcc) {
         this.bcc = bcc;
         return this;
     }
 
-    public SendMailRequestBuilder setLocale(Locale locale) {
+    public SendMailMessageBuilder locale(Locale locale) {
         this.locale = locale;
         return this;
     }
 
-    public SendMailRequestBuilder setTemplateType(String templateType) {
+    public SendMailMessageBuilder templateType(String templateType) {
         this.templateType = templateType;
         return this;
     }
 
-    public SendMailRequestBuilder setTemplateParams(Map<String, Object> templateParams) {
+    public SendMailMessageBuilder templateParams(Map<String, Object> templateParams) {
         this.templateParams = templateParams;
         return this;
     }
 
-    public SendMailRequestBuilder setAttachmentsPaths(List<FilePath> attachmentsPaths) {
+    public SendMailMessageBuilder attachmentsPaths(List<FilePath> attachmentsPaths) {
         this.attachmentsPaths = attachmentsPaths;
         return this;
     }
 
-    public SendMailRequestBuilder setAttachmentsBase64Strings(List<FileString> attachmentsBase64Strings) {
+    public SendMailMessageBuilder attachmentsBase64Strings(List<FileString> attachmentsBase64Strings) {
         this.attachmentsBase64Strings = attachmentsBase64Strings;
         return this;
     }
 
-    public SendMailRequest build() {
-        return new SendMailRequest(to, from, subject, cc, bcc, locale, templateType, templateParams, attachmentsPaths, attachmentsBase64Strings);
+    public SendMailMessage build() {
+        return new SendMailMessage(to, from, subject, cc, bcc, locale, templateType, templateParams, attachmentsPaths, attachmentsBase64Strings);
     }
 }
